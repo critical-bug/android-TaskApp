@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -37,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         mRealm = Realm.getDefaultInstance();
         mTaskRealmResults = mRealm.where(Task.class).findAll().sort("date", Sort.DESCENDING);
-        mRealm.addChangeListener(new RealmChangeListener() {
+        mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange(Object element) {
+            public void onChange(final Realm element) {
                 reloadListView();
             }
         });
@@ -60,18 +61,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if (mTaskRealmResults.size() == 0) {
+            // アプリ起動時にタスクの数が0であった場合は表示テスト用のタスクを作成する
+            addTaskForTest();
+        }
+
         reloadListView();
     }
 
+    private void addTaskForTest() {
+        Task task = new Task();
+        task.setTitle("作業");
+        task.setContent("プログラムを書いてPUSHする");
+        task.setDate(new Date());
+        task.setId(0);
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(task);
+        mRealm.commitTransaction();
+    }
+
     private void reloadListView() {
-        ArrayList<String> taskArrayList = new ArrayList<>();
-        taskArrayList.add("aaa");
-        taskArrayList.add("bbbb");
-        taskArrayList.add("cccccc");
+        ArrayList<Task> taskArrayList = new ArrayList<>();
+
+        for (Task realmTask : mTaskRealmResults) {
+            if (!realmTask.isValid()) continue;
+
+            Task task = new Task();
+
+            task.setId(realmTask.getId());
+            task.setTitle(realmTask.getTitle());
+            task.setContent(realmTask.getContent());
+            task.setDate(realmTask.getDate());
+
+            taskArrayList.add(task);
+        }
 
         mTaskAdapter.setTaskArrayList(taskArrayList);
         mListView.setAdapter(mTaskAdapter);
         mTaskAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mRealm.close();
+    }
 }
