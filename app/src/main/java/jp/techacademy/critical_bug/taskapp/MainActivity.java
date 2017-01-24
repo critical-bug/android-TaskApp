@@ -10,7 +10,14 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
+import io.realm.Sort;
+
 public class MainActivity extends AppCompatActivity {
+    private Realm mRealm;
+    private RealmResults<Task> mTaskRealmResults;
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
 
@@ -25,6 +32,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+            }
+        });
+
+        mRealm = Realm.getDefaultInstance();
+        mTaskRealmResults = mRealm.where(Task.class).findAll().sort("date", Sort.DESCENDING);
+        mRealm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange(Object element) {
+                reloadListView();
             }
         });
 
