@@ -1,9 +1,11 @@
 package jp.techacademy.critical_bug.taskapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -52,14 +54,43 @@ public class MainActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-                // TODO 入力・編集する画面に遷移する
+                // アイテムをタップしたら入力・編集する画面
+                final Task task = (Task) parent.getAdapter().getItem(position);
+
+                final Intent intent = new Intent(MainActivity.this, InputActivity.class);
+                intent.putExtra(EXTRA_TASK, task.getId());
+
+                startActivity(intent);
             }
         });
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-                // TODO タスクを削除する
-                return false;
+                // アイテムのロングタップで削除
+                final Task task = (Task) parent.getAdapter().getItem(position);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                builder.setTitle("削除");
+                builder.setMessage(task.getTitle() + "を削除しますか");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        final RealmResults<Task> results = mRealm.where(Task.class).equalTo("id", task.getId()).findAll();
+
+                        mRealm.beginTransaction();
+                        results.deleteAllFromRealm();
+                        mRealm.commitTransaction();
+
+                        reloadListView();
+                    }
+                });
+                builder.setNegativeButton("CANCEL", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return true;
             }
         });
 
@@ -83,22 +114,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reloadListView() {
-        ArrayList<Task> taskArrayList = new ArrayList<>();
+        final ArrayList<Task> copiedTasks = new ArrayList<>();
 
-        for (Task realmTask : mTaskRealmResults) {
-            if (!realmTask.isValid()) continue;
+        // Realmのデータベースから取得した内容をAdapterなど別の場所で使う場合は直接渡すのではなくコピーして渡す
+        for (final Task task : mTaskRealmResults) {
+            if (!task.isValid()) continue;
 
-            Task task = new Task();
+            final Task newTask = new Task();
+            newTask.setId(task.getId());
+            newTask.setTitle(task.getTitle());
+            newTask.setContent(task.getContent());
+            newTask.setDate(task.getDate());
 
-            task.setId(realmTask.getId());
-            task.setTitle(realmTask.getTitle());
-            task.setContent(realmTask.getContent());
-            task.setDate(realmTask.getDate());
-
-            taskArrayList.add(task);
+            copiedTasks.add(newTask);
         }
 
-        mTaskAdapter.setTaskArrayList(taskArrayList);
+        mTaskAdapter.setTaskArrayList(copiedTasks);
         mListView.setAdapter(mTaskAdapter);
         mTaskAdapter.notifyDataSetChanged();
     }

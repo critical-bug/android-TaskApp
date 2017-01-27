@@ -45,7 +45,7 @@ public class InputActivity extends AppCompatActivity {
                 picker.show();
             }
 
-            private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+            final private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(final DatePicker view, final int year, final int month, final int dayOfMonth) {
                     mYear = year;
@@ -62,12 +62,12 @@ public class InputActivity extends AppCompatActivity {
                 TimePickerDialog picker = new TimePickerDialog(InputActivity.this, listener, mHour, mMinute, false);
                 picker.show();
             }
-            private TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+            final private TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(final TimePicker view, final int hourOfDay, final int minute) {
                     mHour = hourOfDay;
                     mMinute = minute;
-                    mTimeButton.setText(String.format("%0d:%0d", hourOfDay, minute));
+                    mTimeButton.setText(String.format("%02d:%02d", hourOfDay, minute));
                 }
             };
         });
