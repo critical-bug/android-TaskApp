@@ -154,8 +154,8 @@ public class InputActivity extends AppCompatActivity {
     }
 
     /**
-     * このタスクの内容で指定した時刻に通知を登録する。同じIDですでに存在する場合は更新する。
-     * @param timeInMillis 通知を鳴らす時刻
+     * このタスクの内容で指定した時刻にアラームを登録する。同じIDですでに存在する場合は更新する。
+     * @param timeInMillis アラームの予定時刻
      */
     private void setAlarm(final long timeInMillis) {
         final Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
