@@ -27,6 +27,7 @@ public class InputActivity extends AppCompatActivity {
     private Button mDateButton, mTimeButton;
     private EditText mTitleEdit, mContentEdit;
     private Task mTask;
+    private EditText mCategoryEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +83,12 @@ public class InputActivity extends AppCompatActivity {
         });
         mTitleEdit = (EditText)findViewById(R.id.title_edit_text);
         mContentEdit = (EditText)findViewById(R.id.content_edit_text);
+        mCategoryEdit = (EditText) findViewById(R.id.category_edit_text);
 
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         Intent intent = getIntent();
         int taskId = intent.getIntExtra(MainActivity.EXTRA_TASK, -1);
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(TaskApp.realmConfiguration);
         mTask = realm.where(Task.class).equalTo("id", taskId).findFirst();
         realm.close();
 
@@ -102,6 +104,7 @@ public class InputActivity extends AppCompatActivity {
             // 更新の場合
             mTitleEdit.setText(mTask.getTitle());
             mContentEdit.setText(mTask.getContent());
+            mCategoryEdit.setText(mTask.getCategory());
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(mTask.getDate());
@@ -117,7 +120,7 @@ public class InputActivity extends AppCompatActivity {
     }
 
     private void addTask() {
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(TaskApp.realmConfiguration);
 
         realm.beginTransaction();
 
@@ -136,11 +139,9 @@ public class InputActivity extends AppCompatActivity {
             mTask.setId(identifier);
         }
 
-        String title = mTitleEdit.getText().toString();
-        String content = mContentEdit.getText().toString();
-
-        mTask.setTitle(title);
-        mTask.setContent(content);
+        mTask.setTitle(mTitleEdit.getText().toString());
+        mTask.setContent(mContentEdit.getText().toString());
+        mTask.setCategory(mCategoryEdit.getText().toString());
         GregorianCalendar calendar = new GregorianCalendar(mYear,mMonth,mDay,mHour,mMinute);
         Date date = calendar.getTime();
         mTask.setDate(date);

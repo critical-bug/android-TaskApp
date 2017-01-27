@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -42,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mRealm = Realm.getDefaultInstance();
+        // 必要ならマイグレーションする
+        mRealm = Realm.getInstance(TaskApp.realmConfiguration);
         mTaskRealmResults = mRealm.where(Task.class).findAll().sort("date", Sort.DESCENDING);
         mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             newTask.setTitle(task.getTitle());
             newTask.setContent(task.getContent());
             newTask.setDate(task.getDate());
+            newTask.setCategory(task.getCategory());
 
             copiedTasks.add(newTask);
         }

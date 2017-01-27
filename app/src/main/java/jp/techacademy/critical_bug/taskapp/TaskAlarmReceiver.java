@@ -27,7 +27,7 @@ public class TaskAlarmReceiver extends BroadcastReceiver {
 
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         final int taskId = intent.getIntExtra(MainActivity.EXTRA_TASK, -1);
-        final Realm realm = Realm.getDefaultInstance();
+        final Realm realm = Realm.getInstance(TaskApp.realmConfiguration);
         final Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
 
         // タスクの情報を設定する
