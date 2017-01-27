@@ -1,6 +1,8 @@
 package jp.techacademy.critical_bug.taskapp;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -147,5 +149,25 @@ public class InputActivity extends AppCompatActivity {
         realm.commitTransaction();
 
         realm.close();
+
+        setAlarm(calendar.getTimeInMillis());
+    }
+
+    /**
+     * このタスクの内容で指定した時刻に通知を登録する。同じIDですでに存在する場合は更新する。
+     * @param timeInMillis 通知を鳴らす時刻
+     */
+    private void setAlarm(final long timeInMillis) {
+        final Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
+        resultIntent.putExtra(MainActivity.EXTRA_TASK, mTask.getId());
+        final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+                this,
+                mTask.getId(),
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        final AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, resultPendingIntent);
     }
 }

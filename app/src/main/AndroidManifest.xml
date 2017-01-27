@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.techacademy.critical_bug.taskapp">
 
+    <!-- 画面スリープ中でもブロードキャストを受け取る -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <application
         android:name=".TaskApp"
         android:allowBackup="true"
@@ -28,6 +31,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <receiver android:name=".TaskAlarmReceiver"/>
     </application>
 
 </manifest>

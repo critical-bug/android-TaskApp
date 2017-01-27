@@ -1,5 +1,7 @@
 package jp.techacademy.critical_bug.taskapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -64,27 +66,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            private Task task;
+            private void deleteAlarm() {
+                final Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
+                final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+                        MainActivity.this,
+                        task.getId(),
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+                final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.cancel(resultPendingIntent);
+            }
+            final private DialogInterface.OnClickListener deleteOnClick = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int which) {
+                    final RealmResults<Task> results = mRealm.where(Task.class).equalTo("id", task.getId()).findAll();
+
+                    mRealm.beginTransaction();
+                    results.deleteAllFromRealm();
+                    mRealm.commitTransaction();
+
+                    deleteAlarm();
+
+                    reloadListView();
+                }
+            };
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
                 // アイテムのロングタップで削除
-                final Task task = (Task) parent.getAdapter().getItem(position);
+                task = (Task) parent.getAdapter().getItem(position);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
                 builder.setTitle("削除");
                 builder.setMessage(task.getTitle() + "を削除しますか");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        final RealmResults<Task> results = mRealm.where(Task.class).equalTo("id", task.getId()).findAll();
-
-                        mRealm.beginTransaction();
-                        results.deleteAllFromRealm();
-                        mRealm.commitTransaction();
-
-                        reloadListView();
-                    }
-                });
+                builder.setPositiveButton("OK", deleteOnClick);
                 builder.setNegativeButton("CANCEL", null);
 
                 AlertDialog dialog = builder.create();
