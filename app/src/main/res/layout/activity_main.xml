@@ -7,11 +7,6 @@
     android:fitsSystemWindows="true"
     tools:context="jp.techacademy.critical_bug.taskapp.MainActivity">
 
-    <ListView
-        android:id="@+id/listView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -20,5 +15,41 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/plus"
         app:srcCompat="@android:drawable/ic_dialog_email" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:id="@+id/autoCompleteTextView"
+                android:hint="カテゴリ"
+                android:layout_height="42dp"
+                android:maxLines="1"
+                android:lines="1"
+                android:completionThreshold="1"
+                android:layout_weight="1"/>
+
+            <Button
+                android:text="全部表示"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:id="@+id/show_all_button"
+                />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

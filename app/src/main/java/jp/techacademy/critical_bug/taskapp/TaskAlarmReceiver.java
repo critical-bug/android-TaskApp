@@ -15,8 +15,6 @@ import io.realm.Realm;
 public class TaskAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        Log.d("TaskApp", "onReceive");
-
         // 通知の設定を行う
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.small_icon);
